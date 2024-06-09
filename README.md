@@ -1,29 +1,146 @@
-# Create T3 App
+# Sprache - Learn German with AI
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+Sprache is a web application designed to help users learn German using the power of AI. The application leverages OpenAI's text-to-speech capabilities to provide an interactive learning experience.\
+Its basically built on top of [OpenAI's Whisper API](https://openai.com/blog/whisper/).
 
-## What's next? How do I make an app with this?
+## Table of Contents
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+- [Installation](#installation)
+- [Usage](#usage)
+- [API](#api)
+  - [POST /api/v1/speech](#post-apiv1speech)
+- [File Structure](#file-structure)
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## Installation
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+1. **Clone the repository**:
 
-## Learn More
+   ```bash
+   git clone git@github.com:shadmeoli/sprache.ai.git
+   cd sprache
+   ```
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+2. **Install dependencies**:
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+   ```bash
+   bun install
+   ```
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+3. **Set up environment variables**:
+   Create a `.env` file in the root of the project and add your OpenAI API key:
 
-## How do I deploy this?
+   ```env
+   OPENAI_API_KEY=your-openai-api-key
+   ```
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+4. **Run the development server**:
+
+   ```bash
+   bun run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Usage
+
+Navigate to the homepage, where you can interact with the AI-powered German learning tool. Input your text prompts and receive audio responses in German.
+
+## API
+
+### POST /api/v1/speech
+
+This endpoint generates a speech audio file from a given text prompt using OpenAI's text-to-speech model.
+
+#### Request
+
+- **URL**: `/api/v1/speech`
+- **Method**: `POST`
+- **Headers**: `Content-Type: application/json`
+- **Body**:
+  ```json
+  {
+    "prompt": "Your text prompt here"
+  }
+  ```
+
+#### Response
+
+- **Success**:
+  - **Status**: `200 OK`
+  - **Body**: Audio file in `mp3` format.
+  - **Headers**: `Content-Type: audio/mpeg`
+- **Error**:
+  **Error**: `429 Too Many Requests`, if the API rate limit is exceeded. This basically happends if you've not payed for the OpenAI API.
+  - **Body**:
+    ```json
+    {
+      "message": "🥺 Looks like I've not paid, Ooops!"
+    }
+    ```
+
+#### Example
+
+**Request**:
+
+```bash
+curl -X POST http://localhost:3000/api/v1/speech -H "Content-Type: application/json" -d '{"prompt": "Hallo, wie geht es Ihnen?"}'
+```
+
+**Response**:
+An audio file in `mp3` format is returned.
+
+## File Structure
+
+The project directory is structured as follows:
+
+```
+├── package.json
+├── postcss.config.cjs
+├── prettier.config.js
+├── prisma
+│   ├── db.sqlite
+│   └── schema.prisma
+├── public
+│   ├── book.png
+│   └── favicon.ico
+├── README.md
+├── src
+│   ├── app
+│   │   ├── api
+│   │   │   └── v1
+│   │   │       └── speech
+│   │   │           └── route.tsx
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── assets
+│   ├── audio
+│   ├── components
+│   │   └── ui
+│   │       ├── input.tsx
+│   │       ├── sonner.tsx
+│   │       └── textarea.tsx
+│   ├── env.js
+│   ├── lib
+│   │   └── utils.ts
+│   ├── server
+│   │   └── db.ts
+│   └── styles
+│       └── globals.css
+├── tailwind.config.ts
+└── tsconfig.json
+```
+
+### Key Files and Directories
+
+- **`src/app/api/v1/speech/route.tsx`**: API route handler for the speech endpoint.
+- **`src/components/ui`**: UI components such as `input`, `textarea`, and `sonner`.
+- **`src/styles/globals.css`**: Global CSS styles.
+- **`prisma/db.sqlite`**: SQLite database file.
+- **`public`**: Public assets including images and favicon.
+
+---
+
+I have alse setup a model for logging the prompts and the responses. But I have not implement it yet.
+Feel if you want to do it, just create a prims client on the [api/v1/speech](./src/app/api/v1/speech/route.tsx) and setup the write.
+
+> Don't forget to push your database to create a Local database with sqlite and run the migration.
