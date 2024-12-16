@@ -30,7 +30,7 @@ Its basically built on top of [OpenAI's Whisper API](https://openai.com/blog/whi
    Create a `.env` file in the root of the project and add your OpenAI API key:
 
    ```env
-   OPENAI_API_KEY=your-openai-api-key
+   GEMMINIAPI_KEY=your-openai-api-key
    ```
 
 4. **Run the development server**:
