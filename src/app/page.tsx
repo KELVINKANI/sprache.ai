@@ -153,6 +153,13 @@ const HomePage: React.FC = () => {
 
   const currentConversation = conversations.find((c) => c.id === selectedChat);
 
+  useEffect(() => {
+    toast.info("Hello there!!!", {
+      description:
+        "The messages are on a shared database and might accessible to everyone since theres no authentication. Please be careful with your messages.",
+    });
+  }, []);
+
   return (
     <main className="flex h-screen bg-zinc-50">
       {/* Sidebar */}
@@ -176,12 +183,16 @@ const HomePage: React.FC = () => {
         <div className="flex-1 overflow-y-auto p-2">
           {/* ... loading state ... */}
           {conversations.map((chat) => (
-            <div key={chat.id} className="group relative mb-1 flex items-center">
+            <div
+              key={chat.id}
+              className="group relative mb-1 flex items-center"
+            >
               <button
                 onClick={() => setSelectedChat(chat.id)}
                 className={cn(
                   "w-full rounded-lg px-4 py-2 text-left text-sm text-zinc-700 transition-colors hover:bg-zinc-100",
-                  selectedChat === chat.id && "bg-red-50 text-red-700 hover:bg-red-50",
+                  selectedChat === chat.id &&
+                    "bg-red-50 text-red-700 hover:bg-red-50",
                 )}
               >
                 <div className="truncate">{chat.title}</div>
@@ -196,7 +207,9 @@ const HomePage: React.FC = () => {
                   const confirmed = window.confirm("Delete this conversation?");
                   if (confirmed) {
                     // Remove from state
-                    setConversations(prev => prev.filter(c => c.id !== chat.id));
+                    setConversations((prev) =>
+                      prev.filter((c) => c.id !== chat.id),
+                    );
                     if (selectedChat === chat.id) {
                       setSelectedChat(null);
                     }
