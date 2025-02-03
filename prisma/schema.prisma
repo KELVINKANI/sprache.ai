@@ -1,20 +1,43 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "sqlite"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Conversation {
+  id        Int       @id @default(autoincrement())
+  title     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  topic     String?
+  messages  Message[]
+}
 
-    @@index([name])
+model Message {
+  id             Int          @id @default(autoincrement())
+  content        String
+  translation    String?
+  role           String
+  createdAt      DateTime     @default(now())
+  conversationId Int
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+
+  @@index([conversationId])
+}
+
+model VocabularyItem {
+  id         Int      @id @default(autoincrement())
+  german     String
+  english    String
+  type       String
+  example    String?
+  difficulty String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([difficulty])
+  @@index([type])
 }
