@@ -23,17 +23,8 @@ jobs:
         with:
           node-version: '18.x'
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build project
-        run: npm run build
-        
-      - name: Ensure correct startup script
-        run: echo "web:node server.js" > Procfile
-
       - name: Zip artifact for deployment
-        run: zip -r release.zip ./*
+        run: zip release.zip ./* -r
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -48,8 +39,8 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #Required for requesting JWT
-      contents: read #Required for actions/checkout
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
 
     steps:
       - name: Download artifact from build job
@@ -57,17 +48,21 @@ jobs:
         with:
           name: node-app
 
+      - name: Unzip artifact for deployment
+        run: unzip release.zip
+      
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_7C91EB87F84049AC94456D90E7A6A2E3  }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_973B127F79D54CC69BF1B89BB3272F30 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_6BFA1C0BC2AB41ADBC26662A653053D0 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_810BC45E886647819A414300D4A85ED9 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_739E675CE685404EA09214E231991C44 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_13C42E4FB5774A87B2B6F0573E18E5C7 }}
 
-      - name: Deploy to Azure Web App via ZIP Deploy
+      - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'sprache'
           slot-name: 'Production'
-          package: release.zip
+          package: .
+          
