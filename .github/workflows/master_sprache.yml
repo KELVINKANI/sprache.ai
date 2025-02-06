@@ -25,13 +25,20 @@ jobs:
           node-version: '18.x'
           cache: 'npm'
 
+      - name: Ensure dependencies lock file exists
+        run: |
+          if [ ! -f package-lock.json ]; then
+            echo "Lock file missing! Generating package-lock.json..."
+            npm install --package-lock-only
+          fi
+
       - name: Install dependencies, build, and test
         run: |
-          npm ci --production
+          if [ -f package-lock.json ]; then npm ci --production; else npm install --production; fi
           npm run build --if-present
           npm run test --if-present
 
-      - name: Ensure correct startup command
+      - name: Ensure correct startup command in package.json
         run: |
           jq '.scripts.start = "node server.js"' package.json > temp.json && mv temp.json package.json
 
